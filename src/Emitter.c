@@ -4,24 +4,30 @@
 #include <stdio.h>
 #include <memory.h>
 
+ARRAY_IMPL(Token, Token);
 ARRAY_IMPL(uint8_t, Byte);
 ARRAY_IMPL(Label, Label);
 ARRAY_IMPL(UnknownLabel, UnknownLabel);
+ARRAY_IMPL(Macro, Macro);
 
 bool Emitter_Create(Emitter* emitter, Lexer lexer) {
     *emitter               = (Emitter){};
     emitter->Lexer         = lexer;
     emitter->Code          = ByteArray_Create();
     emitter->Current       = Lexer_NextToken(&emitter->Lexer);
+    emitter->NextTokens    = TokenArray_Create();
     emitter->Labels        = LabelArray_Create();
     emitter->UnknownLabels = UnknownLabelArray_Create();
+    emitter->Macros        = MacroArray_Create();
     return true;
 }
 
 void Emitter_Destroy(Emitter* emitter) {
     ByteArray_Destroy(&emitter->Code);
     LabelArray_Destroy(&emitter->Labels);
+    TokenArray_Destroy(&emitter->NextTokens);
     UnknownLabelArray_Destroy(&emitter->UnknownLabels);
+    MacroArray_Destroy(&emitter->Macros);
     Lexer_Destroy(&emitter->Lexer);
 }
 
@@ -63,6 +69,48 @@ void Emitter_Emit(Emitter* emitter) {
                         *(uint64_t*)&emitter->Code.Data[unknown->IndexForAddress] = location;
                     }
                 }
+            } break;
+
+            case TokenKind_Bang: {
+                Emitter_NextToken(emitter);
+                Token name = Emitter_ExpectToken(emitter, TokenKind_Name);
+                bool found = false;
+                for (uint64_t i = 0; i < emitter->Macros.Length; i++) {
+                    if (String_Equal(emitter->Macros.Data[i].Name.StringValue, name.StringValue)) {
+                        for (uint64_t j = 0; j < emitter->Macros.Data[i].Tokens.Length; j++) {
+                            TokenArray_Push(&emitter->NextTokens, emitter->Macros.Data[i].Tokens.Data[j]);
+                        }
+                        TokenArray_Push(&emitter->NextTokens, emitter->Current);
+                        emitter->Current = TokenArray_Remove(&emitter->NextTokens, 0);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    fflush(stdout);
+                    fprintf(stderr,
+                            "%.*s:%llu:%llu: Unknown macro name '%.*s'\n",
+                            String_Fmt(name.FilePath),
+                            name.Line,
+                            name.Column,
+                            String_Fmt(name.StringValue));
+                    emitter->WasError = true;
+                }
+            } break;
+
+            case TokenKind_Macro: {
+                Emitter_NextToken(emitter);
+                Token name = Emitter_ExpectToken(emitter, TokenKind_Name);
+                Emitter_ExpectToken(emitter, TokenKind_OpenParenthesis);
+                Macro* macro = MacroArray_Push(&emitter->Macros,
+                                               (Macro){
+                                                   .Name   = name,
+                                                   .Tokens = TokenArray_Create(),
+                                               });
+                while (emitter->Current.Kind != TokenKind_CloseParenthesis && emitter->Current.Kind != TokenKind_EndOfFile) {
+                    TokenArray_Push(&macro->Tokens, Emitter_NextToken(emitter));
+                }
+                Emitter_ExpectToken(emitter, TokenKind_CloseParenthesis);
             } break;
 
             case TokenKind_Exit: {
@@ -236,8 +284,8 @@ void Emitter_Emit(Emitter* emitter) {
             } break;
 
             default: {
-                fflush(stdout);
                 String name = GetTokenKindName(emitter->Current.Kind);
+                fflush(stdout);
                 fprintf(stderr,
                         "%.*s:%llu:%llu: Unexpected token '%.*s'\n",
                         String_Fmt(emitter->Current.FilePath),
@@ -252,8 +300,12 @@ void Emitter_Emit(Emitter* emitter) {
 }
 
 Token Emitter_NextToken(Emitter* emitter) {
-    Token current    = emitter->Current;
-    emitter->Current = Lexer_NextToken(&emitter->Lexer);
+    Token current = emitter->Current;
+    if (emitter->NextTokens.Length > 0) {
+        emitter->Current = TokenArray_Remove(&emitter->NextTokens, 0);
+    } else {
+        emitter->Current = Lexer_NextToken(&emitter->Lexer);
+    }
     return current;
 }
 

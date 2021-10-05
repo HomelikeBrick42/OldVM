@@ -15,16 +15,26 @@ typedef struct UnknownLabel {
     bool Resolved;
 } UnknownLabel;
 
+ARRAY_DECL(Token, Token);
+
+typedef struct Macro {
+    Token Name;
+    TokenArray Tokens;
+} Macro;
+
 ARRAY_DECL(uint8_t, Byte);
 ARRAY_DECL(Label, Label);
 ARRAY_DECL(UnknownLabel, UnknownLabel);
+ARRAY_DECL(Macro, Macro);
 
 typedef struct Emitter {
     Lexer Lexer;
     ByteArray Code;
     Token Current;
+    TokenArray NextTokens;
     LabelArray Labels;
     UnknownLabelArray UnknownLabels;
+    MacroArray Macros;
     bool WasError;
 } Emitter;
 

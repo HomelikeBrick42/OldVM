@@ -16,10 +16,18 @@ String GetTokenKindName(TokenKind kind) {
             return String_FromLiteral("EndOfFile");
         case TokenKind_Colon:
             return String_FromLiteral(":");
+        case TokenKind_Bang:
+            return String_FromLiteral("!");
+        case TokenKind_OpenParenthesis:
+            return String_FromLiteral("(");
+        case TokenKind_CloseParenthesis:
+            return String_FromLiteral(")");
         case TokenKind_Integer:
             return String_FromLiteral("Integer");
         case TokenKind_Name:
             return String_FromLiteral("Name");
+        case TokenKind_Macro:
+            return String_FromLiteral("macro");
         case TokenKind_Exit:
             return String_FromLiteral("exit");
         case TokenKind_Push:
@@ -53,12 +61,17 @@ String GetTokenKindName(TokenKind kind) {
         case TokenKind_CallCFunc:
             return String_FromLiteral("call-c-func");
     }
+    return String_FromLiteral("UNREACHABLE");
 }
 
 struct {
     String Name;
     TokenKind Kind;
 } Keywords[] = {
+    {
+        .Name = String_FromLiteral("macro"),
+        .Kind = TokenKind_Macro,
+    },
     {
         .Name = String_FromLiteral("exit"),
         .Kind = TokenKind_Exit,
@@ -221,7 +234,7 @@ Start:
             .Source   = lexer->Source,
             .Position = startPosition,
             .Line     = startLine,
-            .Column   = startPosition,
+            .Column   = startColumn,
             .Length   = 0,
         };
     } else if (lexer->Current >= '0' && lexer->Current <= '9') {
@@ -241,7 +254,7 @@ Start:
             .Source   = lexer->Source,
             .Position = startPosition,
             .Line     = startLine,
-            .Column   = startPosition,
+            .Column   = startColumn,
             .Length   = lexer->Position - startPosition,
             .IntValue = intValue,
         };
@@ -269,7 +282,7 @@ Start:
             .Source      = lexer->Source,
             .Position    = startPosition,
             .Line        = startLine,
-            .Column      = startPosition,
+            .Column      = startColumn,
             .Length      = name.Length,
             .StringValue = name,
         };
@@ -291,7 +304,46 @@ Start:
                     .Source   = lexer->Source,
                     .Position = startPosition,
                     .Line     = startLine,
-                    .Column   = startPosition,
+                    .Column   = startColumn,
+                    .Length   = 1,
+                };
+            } break;
+
+            case '!': {
+                Lexer_NextChar(lexer);
+                return (Token){
+                    .Kind     = TokenKind_Bang,
+                    .FilePath = lexer->FilePath,
+                    .Source   = lexer->Source,
+                    .Position = startPosition,
+                    .Line     = startLine,
+                    .Column   = startColumn,
+                    .Length   = 1,
+                };
+            } break;
+
+            case '(': {
+                Lexer_NextChar(lexer);
+                return (Token){
+                    .Kind     = TokenKind_OpenParenthesis,
+                    .FilePath = lexer->FilePath,
+                    .Source   = lexer->Source,
+                    .Position = startPosition,
+                    .Line     = startLine,
+                    .Column   = startColumn,
+                    .Length   = 1,
+                };
+            } break;
+
+            case ')': {
+                Lexer_NextChar(lexer);
+                return (Token){
+                    .Kind     = TokenKind_CloseParenthesis,
+                    .FilePath = lexer->FilePath,
+                    .Source   = lexer->Source,
+                    .Position = startPosition,
+                    .Line     = startLine,
+                    .Column   = startColumn,
                     .Length   = 1,
                 };
             } break;

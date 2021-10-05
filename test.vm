@@ -1,25 +1,19 @@
+macro load-counter (
+    get-stack-bottom
+    load 8
+)
+
 // Counter
 push 8 0
 :loop
-    // Increment
+    // Increment counter
     push 8 1
     add 8
 
-    // An inefficient dup
-    // for an example of pointers
-    get-stack-top
-    push 8 8
-    sub 8
-    load 8
-
-    // you could also use
-    // get-stack-bottom
-    // load 8
-
+    !load-counter
     print 8
 
-    // Sub 10
-    dup 8
+    !load-counter
     push 8 10
     sub 8
 // Loop if not zero
