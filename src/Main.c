@@ -1,9 +1,36 @@
 #include "VM.h"
+#include "Lexer.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <assert.h>
 
+int main(int argc, char** argv) {
+    if (argc != 2) {
+        fflush(stdout);
+        fprintf(stderr, "Usage: %s <file>", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    Lexer lexer;
+    if (!Lexer_Create(&lexer, String_FromCString(argv[1]))) {
+        return EXIT_FAILURE;
+    }
+
+    while (true) {
+        Token token = Lexer_NextToken(&lexer);
+
+        if (token.Kind == TokenKind_EndOfFile) {
+            break;
+        }
+    }
+
+    Lexer_Destroy(&lexer);
+    return EXIT_SUCCESS;
+}
+
+#if 0
 #define ENCODE(ptr, type, value) \
     do {                         \
         *(type*)(ptr) = (value); \
@@ -73,3 +100,4 @@ int main() {
 
     return EXIT_SUCCESS;
 }
+#endif

@@ -1,0 +1,4 @@
+push 8 5
+push 8 6
+add 8
+print 8

@@ -178,7 +178,7 @@ bool VM_Run(VM* vm) {
 
                     default: {
                         for (uint64_t i = 0; i < size; i++) {
-                            printf("%u ", POP_STACK(vm->Sp, uint8_t));
+                            printf("%x ", POP_STACK(vm->Sp, uint8_t));
                         }
                         printf("\n");
                     } break;
@@ -310,6 +310,8 @@ bool VM_Run(VM* vm) {
 
                 uint64_t result = func();
                 VirtualFree(func, 0, MEM_RELEASE);
+#else
+    #error "Unsupported platform"
 #endif
                 for (uint64_t i = 0; i < retSize; i++) {
                     *vm->Sp++ = ((uint8_t*)&result)[i];
