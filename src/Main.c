@@ -24,6 +24,11 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
+    Emitter_Emit(&emitter);
+    if (emitter.WasError) {
+        return EXIT_FAILURE;
+    }
+
     ByteArray code;
     ByteArray_Clone(&code, emitter.Code);
 

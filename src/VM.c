@@ -186,7 +186,7 @@ bool VM_Run(VM* vm) {
             } break;
 
             case Op_Jump: {
-                uint64_t location = POP_STACK(vm->Sp, uint64_t);
+                uint64_t location = DECODE(vm->Ip, uint64_t);
                 vm->Ip            = &vm->Code[location];
             } break;
 

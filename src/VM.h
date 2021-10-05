@@ -72,8 +72,8 @@ typedef enum Op {
 
     // Moves the instruction pointer to the location specified
     // Arguments:
-    //      Inst: op
-    //      Stack: loc
+    //      Inst: op loc
+    //      Stack:
     // Result:
     //      Stack:
     Op_Jump,

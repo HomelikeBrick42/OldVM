@@ -8,10 +8,14 @@
 typedef enum TokenKind {
     TokenKind_Invalid,
     TokenKind_EndOfFile,
+    TokenKind_Colon,
     TokenKind_Integer,
     TokenKind_Name,
     TokenKind_Push,
     TokenKind_Add,
+    TokenKind_Print,
+    TokenKind_Dup,
+    TokenKind_Jump,
 } TokenKind;
 
 String GetTokenKindName(TokenKind kind);

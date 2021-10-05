@@ -14,14 +14,22 @@ String GetTokenKindName(TokenKind kind) {
             return String_FromLiteral("Invalid");
         case TokenKind_EndOfFile:
             return String_FromLiteral("EndOfFile");
+        case TokenKind_Colon:
+            return String_FromLiteral(":");
         case TokenKind_Integer:
             return String_FromLiteral("Integer");
         case TokenKind_Name:
             return String_FromLiteral("Name");
         case TokenKind_Push:
-            return String_FromLiteral("Push");
+            return String_FromLiteral("push");
         case TokenKind_Add:
-            return String_FromLiteral("Add");
+            return String_FromLiteral("add");
+        case TokenKind_Print:
+            return String_FromLiteral("print");
+        case TokenKind_Dup:
+            return String_FromLiteral("dup");
+        case TokenKind_Jump:
+            return String_FromLiteral("jump");
     }
 }
 
@@ -36,6 +44,18 @@ struct {
     {
         .Name = String_FromLiteral("add"),
         .Kind = TokenKind_Add,
+    },
+    {
+        .Name = String_FromLiteral("print"),
+        .Kind = TokenKind_Print,
+    },
+    {
+        .Name = String_FromLiteral("dup"),
+        .Kind = TokenKind_Dup,
+    },
+    {
+        .Name = String_FromLiteral("jump"),
+        .Kind = TokenKind_Jump,
     },
 };
 
@@ -195,6 +215,19 @@ Start:
             case '\r': {
                 Lexer_NextChar(lexer);
                 goto Start;
+            } break;
+
+            case ':': {
+                Lexer_NextChar(lexer);
+                return (Token){
+                    .Kind     = TokenKind_Colon,
+                    .FilePath = lexer->FilePath,
+                    .Source   = lexer->Source,
+                    .Position = startPosition,
+                    .Line     = startLine,
+                    .Column   = startPosition,
+                    .Length   = 1,
+                };
             } break;
 
             default: {
