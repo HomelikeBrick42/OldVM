@@ -1,5 +1,6 @@
 #include "VM.h"
 #include "Lexer.h"
+#include "Emitter.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -18,24 +19,55 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    while (true) {
-        Token token = Lexer_NextToken(&lexer);
-
-        if (token.Kind == TokenKind_EndOfFile) {
-            break;
-        }
+    Emitter emitter;
+    if (!Emitter_Create(&emitter, lexer)) {
+        return EXIT_FAILURE;
     }
 
-    Lexer_Destroy(&lexer);
+    ByteArray code;
+    ByteArray_Clone(&code, emitter.Code);
+
+    Emitter_Destroy(&emitter);
+
+    VM vm;
+    VM_Init(&vm, code.Data, code.Length);
+
+    if (!VM_Run(&vm)) {
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
+
+#if 0
+    bool compiling = true;
+    while (compiling) {
+        Token token = Lexer_NextToken(&lexer);
+        switch (token.Kind) {
+            case TokenKind_EndOfFile: {
+                compiling = false;
+            } break;
+
+            default: {
+                fflush(stdout);
+                String name = GetTokenKindName(token.Kind);
+                fprintf(stderr,
+                        "%.*s:%llu:%llu: Unexpected token '%.*s'\n",
+                        String_Fmt(token.FilePath),
+                        token.Line,
+                        token.Column,
+                        String_Fmt(name));
+            } break;
+        }
+    }
+#endif
 }
 
 #if 0
-#define ENCODE(ptr, type, value) \
-    do {                         \
-        *(type*)(ptr) = (value); \
-        (ptr) += sizeof(type);   \
-    } while (0)
+    #define ENCODE(ptr, type, value) \
+        do {                         \
+            *(type*)(ptr) = (value); \
+            (ptr) += sizeof(type);   \
+        } while (0)
 
 uint64_t Func(uint8_t a, uint16_t b, uint64_t* c) {
     *c = a + b;

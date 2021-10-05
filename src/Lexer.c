@@ -8,6 +8,23 @@
     #include <Windows.h>
 #endif
 
+String GetTokenKindName(TokenKind kind) {
+    switch (kind) {
+        case TokenKind_Invalid:
+            return String_FromLiteral("Invalid");
+        case TokenKind_EndOfFile:
+            return String_FromLiteral("EndOfFile");
+        case TokenKind_Integer:
+            return String_FromLiteral("Integer");
+        case TokenKind_Name:
+            return String_FromLiteral("Name");
+        case TokenKind_Push:
+            return String_FromLiteral("Push");
+        case TokenKind_Add:
+            return String_FromLiteral("Add");
+    }
+}
+
 struct {
     String Name;
     TokenKind Kind;

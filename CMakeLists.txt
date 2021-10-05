@@ -20,6 +20,9 @@ include_directories(src)
 
 add_executable(
         VM
+        src/Array.h
+        src/Emitter.c
+        src/Emitter.h
         src/Lexer.c
         src/Lexer.h
         src/Main.c

@@ -14,6 +14,8 @@ typedef enum TokenKind {
     TokenKind_Add,
 } TokenKind;
 
+String GetTokenKindName(TokenKind kind);
+
 typedef struct Token {
     TokenKind Kind;
     String FilePath;
