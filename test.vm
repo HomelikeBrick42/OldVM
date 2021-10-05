@@ -6,6 +6,7 @@ push 8 0
     add 8
 
     // A very inefficient dup
+    // for an example of pointers
     get-top-stack
     push 8 8
     sub 8
