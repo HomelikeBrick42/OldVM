@@ -20,7 +20,7 @@
 #define POP_STACK(ptr, type) (((ptr) -= sizeof(type)), *(type*)(ptr))
 
 void VM_Init(VM* vm, uint8_t* code, uint64_t codeSize) {
-    *vm           = (VM){};
+    memset(vm, 0, sizeof(VM));
     vm->Code      = code;
     vm->CodeSize  = codeSize;
     vm->Ip        = vm->Code;

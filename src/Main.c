@@ -34,12 +34,19 @@ int main(int argc, char** argv) {
 
     Emitter_Destroy(&emitter);
 
-    VM vm;
-    VM_Init(&vm, code.Data, code.Length);
-
-    if (!VM_Run(&vm)) {
+    // VM is too big for the stack
+    VM* vm = malloc(sizeof(VM));
+    if (!vm) {
         return EXIT_FAILURE;
     }
+
+    VM_Init(vm, code.Data, code.Length);
+
+    if (!VM_Run(vm)) {
+        return EXIT_FAILURE;
+    }
+
+    free(vm);
 
     return EXIT_SUCCESS;
 
