@@ -18,4 +18,6 @@ endif ()
 
 include_directories(src)
 
-add_executable(VM main.c)
+add_executable(
+        VM
+        src/Main.c src/VM.h src/VM.c)

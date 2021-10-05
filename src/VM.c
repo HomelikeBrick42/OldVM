@@ -1,128 +1,11 @@
+#include "VM.h"
+
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
 
 #if defined(_WIN32)
     #include <Windows.h>
 #endif
-
-typedef enum Op {
-    Op_Invalid,
-
-    // Exits the virtual machine
-    // Arguments:
-    //      Inst: op
-    //      Stack:
-    // Result:
-    //      Stack:
-    Op_Exit,
-
-    // Pushes data onto the stack
-    // Arguments:
-    //      Inst: op size data
-    //      Stack:
-    // Result:
-    //      Stack: data
-    Op_Push,
-
-    // Allocates zero-initialized space on top of the stack
-    // Arguments:
-    //      Inst: op size
-    //      Stack:
-    // Result:
-    //      Stack: data
-    Op_AllocStack,
-
-    // Pops data from the stack
-    // Arguments:
-    //      Inst: op size
-    //      Stack: data
-    // Result:
-    //      Stack:
-    Op_Pop,
-
-    // Duplicates data on the stack
-    // Arguments:
-    //      Inst: op size
-    //      Stack: data
-    // Result:
-    //      Stack: data data
-    Op_Dup,
-
-    // Adds the 2 numbers on the top of the stack
-    // Arguments:
-    //      Inst: op size
-    //      Stack: a b
-    // Result:
-    //      Stack: (a+b)
-    Op_Add,
-
-    // Subtracts the 2 numbers on the top of the stack
-    // Arguments:
-    //      Inst: op size
-    //      Stack: a b
-    // Result:
-    //      Stack: (a-b)
-    Op_Sub,
-
-    // Prints the data on the top of the stack
-    // Arguments:
-    //      Inst: op size
-    //      Stack: data
-    // Result:
-    //      Stack:
-    Op_Print,
-
-    // Moves the instruction pointer to the location specified
-    // Arguments:
-    //      Inst: op
-    //      Stack: loc
-    // Result:
-    //      Stack:
-    Op_Jump,
-
-    // Puts a pointer to the top of the stack on the stack
-    // Arguments:
-    //      Inst: op
-    //      Stack:
-    // Result:
-    //      Stack: ptr
-    Op_GetStackTop,
-
-    // Reads from a pointer
-    // Arguments:
-    //      Inst: op size
-    //      Stack: ptr
-    // Result:
-    //      Stack: data
-    Op_Read,
-
-    // Stores data into a pointer
-    // Arguments:
-    //      Inst: op size
-    //      Stack: ptr data
-    // Result:
-    //      Stack:
-    Op_Store,
-
-    // Calls a C function
-    // Arguments:
-    //      Inst: op arg-count arg-sizes ret-size
-    //      Stack: ptr arg-data
-    // Result:
-    //      Stack: ret-value
-    Op_CallCFunc,
-} Op;
-
-typedef struct VM {
-    uint8_t* Code;
-    uint64_t CodeSize;
-    uint8_t* Ip;
-    uint8_t Stack[1024];
-    uint64_t StackSize;
-    uint8_t* Sp;
-} VM;
 
 #define ENCODE(ptr, type, value) \
     do {                         \
@@ -374,42 +257,37 @@ bool VM_Run(VM* vm) {
                             // REX.W mov rcx, imm64
                             *ip++          = 0b01001000;
                             *ip++          = 0b10111001;
-                            *(uint64_t*)ip = value;
-                            ip += sizeof(uint64_t);
+                            ENCODE(ip, uint64_t, value);
                         } break;
 
                         case 1: {
                             // REX.W mov rdx, imm64
                             *ip++          = 0b01001000;
                             *ip++          = 0b10111010;
-                            *(uint64_t*)ip = value;
-                            ip += sizeof(uint64_t);
+                            ENCODE(ip, uint64_t, value);
                         } break;
 
                         case 2: {
                             // REX.WB mov r8, imm64
                             *ip++          = 0b01001001;
                             *ip++          = 0b10111000;
-                            *(uint64_t*)ip = value;
-                            ip += sizeof(uint64_t);
+                            ENCODE(ip, uint64_t, value);
                         } break;
 
                         case 3: {
                             // REX.WB mov r9, imm64
                             *ip++          = 0b01001001;
                             *ip++          = 0b10111001;
-                            *(uint64_t*)ip = value;
-                            ip += sizeof(uint64_t);
+                            ENCODE(ip, uint64_t, value);
                         } break;
 
                         default: {
                             // REX.W mov rax, imm64
                             *ip++          = 0b01001000;
                             *ip++          = 0b10111000;
-                            *(uint64_t*)ip = value;
-                            ip += sizeof(uint64_t);
+                            ENCODE(ip, uint64_t, value);
 
-                            // Push rax
+                            // push rax
                             *ip++ = 0x50;
                         } break;
                     }
@@ -445,68 +323,4 @@ bool VM_Run(VM* vm) {
             } break;
         }
     }
-}
-
-uint64_t Func(uint8_t a, uint16_t b, uint64_t* c) {
-    *c = a + (uint64_t)b;
-    return *c + a;
-}
-
-int main() {
-    uint8_t code[1024] = {};
-    uint64_t codeSize  = 0;
-
-    uint64_t a = 0;
-    uint64_t b = 0;
-
-    {
-        uint8_t* ip = code;
-
-        *ip++ = Op_Push;
-        ENCODE(ip, uint64_t, sizeof(uint64_t*));
-        ENCODE(ip, uint64_t*, &b);
-
-        *ip++ = Op_Push;
-        ENCODE(ip, uint64_t, sizeof(void*));
-        ENCODE(ip, void*, Func);
-
-        *ip++ = Op_Push;
-        ENCODE(ip, uint64_t, sizeof(uint64_t));
-        ENCODE(ip, uint64_t, 5);
-
-        *ip++ = Op_Push;
-        ENCODE(ip, uint64_t, sizeof(uint16_t));
-        ENCODE(ip, uint16_t, 6);
-
-        *ip++ = Op_Push;
-        ENCODE(ip, uint64_t, sizeof(uint64_t*));
-        ENCODE(ip, uint64_t*, &a);
-
-        *ip++ = Op_CallCFunc;
-        ENCODE(ip, uint64_t, 3);
-        // Argument sizes
-        ENCODE(ip, uint64_t, sizeof(uint64_t));
-        ENCODE(ip, uint64_t, sizeof(uint16_t));
-        ENCODE(ip, uint64_t, sizeof(uint64_t*));
-        // Return size
-        ENCODE(ip, uint64_t, sizeof(uint64_t));
-
-        *ip++ = Op_Store;
-        ENCODE(ip, uint64_t, sizeof(uint64_t));
-
-        *ip++ = Op_Exit;
-
-        codeSize = ip - code;
-    }
-
-    VM vm;
-    VM_Init(&vm, code, codeSize);
-    if (!VM_Run(&vm)) {
-        VM_PrintStack(&vm);
-        return EXIT_FAILURE;
-    }
-
-    printf("a=%llu, b=%llu\n", a, b);
-
-    return EXIT_SUCCESS;
 }
