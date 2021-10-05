@@ -26,12 +26,18 @@ String GetTokenKindName(TokenKind kind) {
             return String_FromLiteral("push");
         case TokenKind_Add:
             return String_FromLiteral("add");
+        case TokenKind_Sub:
+            return String_FromLiteral("sub");
         case TokenKind_Print:
             return String_FromLiteral("print");
         case TokenKind_Dup:
             return String_FromLiteral("dup");
         case TokenKind_Jump:
             return String_FromLiteral("jump");
+        case TokenKind_JumpZero:
+            return String_FromLiteral("jump-zero");
+        case TokenKind_JumpNonZero:
+            return String_FromLiteral("jump-non-zero");
     }
 }
 
@@ -52,6 +58,10 @@ struct {
         .Kind = TokenKind_Add,
     },
     {
+        .Name = String_FromLiteral("sub"),
+        .Kind = TokenKind_Sub,
+    },
+    {
         .Name = String_FromLiteral("print"),
         .Kind = TokenKind_Print,
     },
@@ -62,6 +72,14 @@ struct {
     {
         .Name = String_FromLiteral("jump"),
         .Kind = TokenKind_Jump,
+    },
+    {
+        .Name = String_FromLiteral("jump-zero"),
+        .Kind = TokenKind_JumpZero,
+    },
+    {
+        .Name = String_FromLiteral("jump-non-zero"),
+        .Kind = TokenKind_JumpNonZero,
     },
 };
 
@@ -192,7 +210,7 @@ Start:
             .Length = 0,
         };
         while ((lexer->Current >= 'A' && lexer->Current <= 'Z') || (lexer->Current >= 'a' && lexer->Current <= 'z') ||
-               (lexer->Current >= '0' && lexer->Current <= '9') || lexer->Current == '_') {
+               (lexer->Current >= '0' && lexer->Current <= '9') || lexer->Current == '_' || lexer->Current == '-') {
             Lexer_NextChar(lexer);
             name.Length++;
         }

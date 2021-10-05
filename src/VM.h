@@ -78,6 +78,22 @@ typedef enum Op {
     //      Stack:
     Op_Jump,
 
+    // Moves the instruction pointer to the location specified
+    // Arguments:
+    //      Inst: op size loc
+    //      Stack: data
+    // Result:
+    //      Stack:
+    Op_JumpZero,
+
+    // Jumps to the location if the data is 0
+    // Arguments:
+    //      Inst: op size loc
+    //      Stack: data
+    // Result:
+    //      Stack:
+    Op_JumpNonZero,
+
     // Puts a pointer to the top of the stack on the stack
     // Arguments:
     //      Inst: op

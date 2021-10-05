@@ -14,9 +14,12 @@ typedef enum TokenKind {
     TokenKind_Exit,
     TokenKind_Push,
     TokenKind_Add,
+    TokenKind_Sub,
     TokenKind_Print,
     TokenKind_Dup,
     TokenKind_Jump,
+    TokenKind_JumpZero,
+    TokenKind_JumpNonZero,
 } TokenKind;
 
 String GetTokenKindName(TokenKind kind);

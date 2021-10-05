@@ -87,6 +87,13 @@ void Emitter_Emit(Emitter* emitter) {
                 Emitter_Emit64(emitter, size);
             } break;
 
+            case TokenKind_Sub: {
+                Emitter_NextToken(emitter);
+                uint64_t size = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
+                Emitter_EmitOp(emitter, Op_Sub);
+                Emitter_Emit64(emitter, size);
+            } break;
+
             case TokenKind_Print: {
                 Emitter_NextToken(emitter);
                 uint64_t size = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
@@ -114,6 +121,58 @@ void Emitter_Emit(Emitter* emitter) {
                     }
                 }
                 Emitter_EmitOp(emitter, Op_Jump);
+                if (!found) {
+                    UnknownLabelArray_Push(&emitter->UnknownLabels,
+                                           (UnknownLabel){
+                                               .Token           = name,
+                                               .IndexForAddress = emitter->Code.Length,
+                                               .Resolved        = false,
+                                           });
+                }
+                Emitter_Emit64(emitter, location);
+            } break;
+
+            case TokenKind_JumpZero: {
+                Emitter_NextToken(emitter);
+                uint64_t size     = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
+                Token name        = Emitter_ExpectToken(emitter, TokenKind_Name);
+                bool found        = false;
+                uint64_t location = 0;
+                for (uint64_t i = 0; i < emitter->Labels.Length; i++) {
+                    if (String_Equal(emitter->Labels.Data[i].Token.StringValue, name.StringValue)) {
+                        found    = true;
+                        location = emitter->Labels.Data[i].Location;
+                        break;
+                    }
+                }
+                Emitter_EmitOp(emitter, Op_JumpZero);
+                Emitter_Emit64(emitter, size);
+                if (!found) {
+                    UnknownLabelArray_Push(&emitter->UnknownLabels,
+                                           (UnknownLabel){
+                                               .Token           = name,
+                                               .IndexForAddress = emitter->Code.Length,
+                                               .Resolved        = false,
+                                           });
+                }
+                Emitter_Emit64(emitter, location);
+            } break;
+
+            case TokenKind_JumpNonZero: {
+                Emitter_NextToken(emitter);
+                uint64_t size     = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
+                Token name        = Emitter_ExpectToken(emitter, TokenKind_Name);
+                bool found        = false;
+                uint64_t location = 0;
+                for (uint64_t i = 0; i < emitter->Labels.Length; i++) {
+                    if (String_Equal(emitter->Labels.Data[i].Token.StringValue, name.StringValue)) {
+                        found    = true;
+                        location = emitter->Labels.Data[i].Location;
+                        break;
+                    }
+                }
+                Emitter_EmitOp(emitter, Op_JumpNonZero);
+                Emitter_Emit64(emitter, size);
                 if (!found) {
                     UnknownLabelArray_Push(&emitter->UnknownLabels,
                                            (UnknownLabel){

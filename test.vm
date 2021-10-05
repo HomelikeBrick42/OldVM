@@ -1,7 +1,13 @@
 push 8 0
 :loop
-push 8 1
-add 8
-dup 8
-print 8
-jump loop
+    push 8 1
+    add 8
+
+    dup 8
+    print 8
+
+    dup 8
+    push 8 10
+    sub 8
+jump-non-zero 8 loop
+exit

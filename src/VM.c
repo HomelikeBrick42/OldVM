@@ -190,6 +190,34 @@ bool VM_Run(VM* vm) {
                 vm->Ip            = &vm->Code[location];
             } break;
 
+            case Op_JumpZero: {
+                uint64_t size     = DECODE(vm->Ip, uint64_t);
+                uint64_t location = DECODE(vm->Ip, uint64_t);
+                bool zero         = true;
+                for (uint64_t i = 0; i < size; i++) {
+                    if (*--vm->Sp != 0) {
+                        zero = false;
+                    }
+                }
+                if (zero) {
+                    vm->Ip = &vm->Code[location];
+                }
+            } break;
+
+            case Op_JumpNonZero: {
+                uint64_t size     = DECODE(vm->Ip, uint64_t);
+                uint64_t location = DECODE(vm->Ip, uint64_t);
+                bool zero         = true;
+                for (uint64_t i = 0; i < size; i++) {
+                    if (*--vm->Sp != 0) {
+                        zero = false;
+                    }
+                }
+                if (!zero) {
+                    vm->Ip = &vm->Code[location];
+                }
+            } break;
+
             case Op_GetStackTop: {
                 void* ptr = vm->Sp;
                 PUSH_STACK(vm->Sp, void*, ptr);
