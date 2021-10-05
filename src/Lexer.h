@@ -10,7 +10,8 @@ typedef enum TokenKind {
     TokenKind_EndOfFile,
     TokenKind_Integer,
     TokenKind_Name,
-    TokenKind_Mov,
+    TokenKind_Push,
+    TokenKind_Add,
 } TokenKind;
 
 typedef struct Token {

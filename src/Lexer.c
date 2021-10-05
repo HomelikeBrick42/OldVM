@@ -8,6 +8,20 @@
     #include <Windows.h>
 #endif
 
+struct {
+    String Name;
+    TokenKind Kind;
+} Keywords[] = {
+    {
+        .Name = String_FromLiteral("push"),
+        .Kind = TokenKind_Push,
+    },
+    {
+        .Name = String_FromLiteral("add"),
+        .Kind = TokenKind_Add,
+    },
+};
+
 bool Lexer_Create(Lexer* lexer, String filepath) {
     *lexer = (Lexer){};
 
@@ -139,8 +153,15 @@ Start:
             Lexer_NextChar(lexer);
             name.Length++;
         }
+        TokenKind kind = TokenKind_Name;
+        for (uint64_t i = 0; i < sizeof(Keywords) / sizeof(Keywords[0]); i++) {
+            if (String_Equal(Keywords[i].Name, name)) {
+                kind = Keywords[i].Kind;
+                break;
+            }
+        }
         return (Token){
-            .Kind        = TokenKind_Name,
+            .Kind        = kind,
             .FilePath    = lexer->FilePath,
             .Source      = lexer->Source,
             .Position    = startPosition,

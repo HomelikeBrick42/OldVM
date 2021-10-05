@@ -10,7 +10,7 @@ typedef struct String {
 
 #define String_FromLiteral(s)    \
     ((String){                   \
-        .Data   = (uint8_t)(s),  \
+        .Data   = (uint8_t*)(s), \
         .Length = sizeof(s) - 1, \
     })
 
