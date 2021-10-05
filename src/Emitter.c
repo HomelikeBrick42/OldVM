@@ -80,6 +80,27 @@ void Emitter_Emit(Emitter* emitter) {
                 Emitter_EmitBytes(emitter, (uint8_t*)&value, size);
             } break;
 
+            case TokenKind_AllocStack: {
+                Emitter_NextToken(emitter);
+                uint64_t size = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
+                Emitter_EmitOp(emitter, Op_AllocStack);
+                Emitter_Emit64(emitter, size);
+            } break;
+
+            case TokenKind_Pop: {
+                Emitter_NextToken(emitter);
+                uint64_t size = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
+                Emitter_EmitOp(emitter, Op_Pop);
+                Emitter_Emit64(emitter, size);
+            } break;
+
+            case TokenKind_Dup: {
+                Emitter_NextToken(emitter);
+                uint64_t size = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
+                Emitter_EmitOp(emitter, Op_Dup);
+                Emitter_Emit64(emitter, size);
+            } break;
+
             case TokenKind_Add: {
                 Emitter_NextToken(emitter);
                 uint64_t size = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
@@ -98,13 +119,6 @@ void Emitter_Emit(Emitter* emitter) {
                 Emitter_NextToken(emitter);
                 uint64_t size = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
                 Emitter_EmitOp(emitter, Op_Print);
-                Emitter_Emit64(emitter, size);
-            } break;
-
-            case TokenKind_Dup: {
-                Emitter_NextToken(emitter);
-                uint64_t size = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
-                Emitter_EmitOp(emitter, Op_Dup);
                 Emitter_Emit64(emitter, size);
             } break;
 
@@ -182,6 +196,38 @@ void Emitter_Emit(Emitter* emitter) {
                                            });
                 }
                 Emitter_Emit64(emitter, location);
+            } break;
+
+            case TokenKind_GetTopStack: {
+                Emitter_NextToken(emitter);
+                Emitter_EmitOp(emitter, Op_GetStackTop);
+            } break;
+
+            case TokenKind_Load: {
+                Emitter_NextToken(emitter);
+                uint64_t size = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
+                Emitter_EmitOp(emitter, Op_Load);
+                Emitter_Emit64(emitter, size);
+            } break;
+
+            case TokenKind_Store: {
+                Emitter_NextToken(emitter);
+                uint64_t size = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
+                Emitter_EmitOp(emitter, Op_Load);
+                Emitter_Emit64(emitter, size);
+            } break;
+
+            case TokenKind_CallCFunc: {
+                Emitter_NextToken(emitter);
+                uint64_t argCount = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
+                Emitter_EmitOp(emitter, Op_CallCFunc);
+                Emitter_Emit64(emitter, argCount);
+                for (uint64_t i = 0; i < argCount; i++) {
+                    uint64_t argSize = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
+                    Emitter_Emit64(emitter, argSize);
+                }
+                uint64_t retSize = Emitter_ExpectToken(emitter, TokenKind_Integer).IntValue;
+                Emitter_Emit64(emitter, retSize);
             } break;
 
             default: {

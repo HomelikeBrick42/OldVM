@@ -102,13 +102,13 @@ typedef enum Op {
     //      Stack: ptr
     Op_GetStackTop,
 
-    // Reads from a pointer
+    // Loads from a pointer
     // Arguments:
     //      Inst: op size
     //      Stack: ptr
     // Result:
     //      Stack: data
-    Op_Read,
+    Op_Load,
 
     // Stores data into a pointer
     // Arguments:

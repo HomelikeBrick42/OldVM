@@ -1,13 +1,21 @@
+// Counter
 push 8 0
 :loop
+    // Increment
     push 8 1
     add 8
 
-    dup 8
+    // A very inefficient dup
+    get-top-stack
+    push 8 8
+    sub 8
+    load 8
     print 8
 
+    // Sub 10
     dup 8
     push 8 10
     sub 8
+// Loop if not zero
 jump-non-zero 8 loop
 exit

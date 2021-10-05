@@ -13,6 +13,8 @@ typedef enum TokenKind {
     TokenKind_Name,
     TokenKind_Exit,
     TokenKind_Push,
+    TokenKind_Pop,
+    TokenKind_AllocStack,
     TokenKind_Add,
     TokenKind_Sub,
     TokenKind_Print,
@@ -20,6 +22,10 @@ typedef enum TokenKind {
     TokenKind_Jump,
     TokenKind_JumpZero,
     TokenKind_JumpNonZero,
+    TokenKind_GetTopStack,
+    TokenKind_Load,
+    TokenKind_Store,
+    TokenKind_CallCFunc,
 } TokenKind;
 
 String GetTokenKindName(TokenKind kind);

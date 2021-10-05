@@ -24,6 +24,10 @@ String GetTokenKindName(TokenKind kind) {
             return String_FromLiteral("exit");
         case TokenKind_Push:
             return String_FromLiteral("push");
+        case TokenKind_Pop:
+            return String_FromLiteral("pop");
+        case TokenKind_AllocStack:
+            return String_FromLiteral("alloc-stack");
         case TokenKind_Add:
             return String_FromLiteral("add");
         case TokenKind_Sub:
@@ -38,6 +42,14 @@ String GetTokenKindName(TokenKind kind) {
             return String_FromLiteral("jump-zero");
         case TokenKind_JumpNonZero:
             return String_FromLiteral("jump-non-zero");
+        case TokenKind_GetTopStack:
+            return String_FromLiteral("get-top-stack");
+        case TokenKind_Load:
+            return String_FromLiteral("load");
+        case TokenKind_Store:
+            return String_FromLiteral("store");
+        case TokenKind_CallCFunc:
+            return String_FromLiteral("call-c-func");
     }
 }
 
@@ -52,6 +64,14 @@ struct {
     {
         .Name = String_FromLiteral("push"),
         .Kind = TokenKind_Push,
+    },
+    {
+        .Name = String_FromLiteral("pop"),
+        .Kind = TokenKind_Pop,
+    },
+    {
+        .Name = String_FromLiteral("alloc-stack"),
+        .Kind = TokenKind_AllocStack,
     },
     {
         .Name = String_FromLiteral("add"),
@@ -80,6 +100,22 @@ struct {
     {
         .Name = String_FromLiteral("jump-non-zero"),
         .Kind = TokenKind_JumpNonZero,
+    },
+    {
+        .Name = String_FromLiteral("get-top-stack"),
+        .Kind = TokenKind_GetTopStack,
+    },
+    {
+        .Name = String_FromLiteral("load"),
+        .Kind = TokenKind_Load,
+    },
+    {
+        .Name = String_FromLiteral("store"),
+        .Kind = TokenKind_Store,
+    },
+    {
+        .Name = String_FromLiteral("call-c-func"),
+        .Kind = TokenKind_CallCFunc,
     },
 };
 
@@ -252,6 +288,26 @@ Start:
                     .Column   = startPosition,
                     .Length   = 1,
                 };
+            } break;
+
+            case '/': {
+                uint8_t chr = lexer->Current;
+                Lexer_NextChar(lexer);
+                if (lexer->Current != '/') {
+                    fflush(stdout);
+                    fprintf(stderr,
+                            "%.*s:%llu:%llu: Unexpected character '%c'\n",
+                            String_Fmt(lexer->FilePath),
+                            startLine,
+                            startColumn,
+                            chr);
+                    goto Start;
+                }
+                Lexer_NextChar(lexer);
+                while (lexer->Current != '\n' && lexer->Current != '\0') {
+                    Lexer_NextChar(lexer);
+                }
+                goto Start;
             } break;
 
             default: {

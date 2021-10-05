@@ -223,7 +223,7 @@ bool VM_Run(VM* vm) {
                 PUSH_STACK(vm->Sp, void*, ptr);
             } break;
 
-            case Op_Read: {
+            case Op_Load: {
                 uint64_t size = DECODE(vm->Ip, uint64_t);
                 uint8_t* ptr  = POP_STACK(vm->Sp, uint8_t*);
                 for (uint64_t i = 0; i < size; i++) {
