@@ -27,6 +27,9 @@ void Emitter_Destroy(Emitter* emitter) {
     LabelArray_Destroy(&emitter->Labels);
     TokenArray_Destroy(&emitter->NextTokens);
     UnknownLabelArray_Destroy(&emitter->UnknownLabels);
+    for (uint64_t i = 0; i < emitter->Macros.Length; i++) {
+        TokenArray_Destroy(&emitter->Macros.Data[i].Tokens);
+    }
     MacroArray_Destroy(&emitter->Macros);
     Lexer_Destroy(&emitter->Lexer);
 }
