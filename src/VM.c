@@ -255,36 +255,36 @@ bool VM_Run(VM* vm) {
                     switch (i) {
                         case 0: {
                             // REX.W mov rcx, imm64
-                            *ip++          = 0b01001000;
-                            *ip++          = 0b10111001;
+                            *ip++ = 0b01001000;
+                            *ip++ = 0b10111001;
                             ENCODE(ip, uint64_t, value);
                         } break;
 
                         case 1: {
                             // REX.W mov rdx, imm64
-                            *ip++          = 0b01001000;
-                            *ip++          = 0b10111010;
+                            *ip++ = 0b01001000;
+                            *ip++ = 0b10111010;
                             ENCODE(ip, uint64_t, value);
                         } break;
 
                         case 2: {
                             // REX.WB mov r8, imm64
-                            *ip++          = 0b01001001;
-                            *ip++          = 0b10111000;
+                            *ip++ = 0b01001001;
+                            *ip++ = 0b10111000;
                             ENCODE(ip, uint64_t, value);
                         } break;
 
                         case 3: {
                             // REX.WB mov r9, imm64
-                            *ip++          = 0b01001001;
-                            *ip++          = 0b10111001;
+                            *ip++ = 0b01001001;
+                            *ip++ = 0b10111001;
                             ENCODE(ip, uint64_t, value);
                         } break;
 
                         default: {
                             // REX.W mov rax, imm64
-                            *ip++          = 0b01001000;
-                            *ip++          = 0b10111000;
+                            *ip++ = 0b01001000;
+                            *ip++ = 0b10111000;
                             ENCODE(ip, uint64_t, value);
 
                             // push rax

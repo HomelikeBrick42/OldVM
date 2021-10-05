@@ -11,7 +11,7 @@
     } while (0)
 
 uint64_t Func(uint8_t a, uint16_t b, uint64_t* c) {
-    *c = a + (uint64_t)b;
+    *c = a + b;
     return *c + a;
 }
 
@@ -34,8 +34,8 @@ int main() {
         ENCODE(ip, void*, Func);
 
         *ip++ = Op_Push;
-        ENCODE(ip, uint64_t, sizeof(uint64_t));
-        ENCODE(ip, uint64_t, 5);
+        ENCODE(ip, uint64_t, sizeof(uint8_t));
+        ENCODE(ip, uint8_t, 5);
 
         *ip++ = Op_Push;
         ENCODE(ip, uint64_t, sizeof(uint16_t));
@@ -48,7 +48,7 @@ int main() {
         *ip++ = Op_CallCFunc;
         ENCODE(ip, uint64_t, 3);
         // Argument sizes
-        ENCODE(ip, uint64_t, sizeof(uint64_t));
+        ENCODE(ip, uint64_t, sizeof(uint8_t));
         ENCODE(ip, uint64_t, sizeof(uint16_t));
         ENCODE(ip, uint64_t, sizeof(uint64_t*));
         // Return size
