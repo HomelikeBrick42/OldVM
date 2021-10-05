@@ -11,6 +11,7 @@ typedef enum TokenKind {
     TokenKind_Colon,
     TokenKind_Integer,
     TokenKind_Name,
+    TokenKind_Exit,
     TokenKind_Push,
     TokenKind_Add,
     TokenKind_Print,

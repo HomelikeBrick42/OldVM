@@ -20,6 +20,8 @@ String GetTokenKindName(TokenKind kind) {
             return String_FromLiteral("Integer");
         case TokenKind_Name:
             return String_FromLiteral("Name");
+        case TokenKind_Exit:
+            return String_FromLiteral("exit");
         case TokenKind_Push:
             return String_FromLiteral("push");
         case TokenKind_Add:
@@ -37,6 +39,10 @@ struct {
     String Name;
     TokenKind Kind;
 } Keywords[] = {
+    {
+        .Name = String_FromLiteral("exit"),
+        .Kind = TokenKind_Exit,
+    },
     {
         .Name = String_FromLiteral("push"),
         .Kind = TokenKind_Push,

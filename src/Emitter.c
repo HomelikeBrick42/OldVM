@@ -29,7 +29,6 @@ void Emitter_Emit(Emitter* emitter) {
     while (true) {
         switch (emitter->Current.Kind) {
             case TokenKind_EndOfFile: {
-                Emitter_EmitOp(emitter, Op_Exit);
                 while (emitter->UnknownLabels.Length > 0) {
                     UnknownLabel unknown = UnknownLabelArray_Pop(&emitter->UnknownLabels);
                     if (!unknown.Resolved) {
@@ -64,6 +63,11 @@ void Emitter_Emit(Emitter* emitter) {
                         *(uint64_t*)&emitter->Code.Data[unknown->IndexForAddress] = location;
                     }
                 }
+            } break;
+
+            case TokenKind_Exit: {
+                Emitter_NextToken(emitter);
+                Emitter_EmitOp(emitter, Op_Exit);
             } break;
 
             case TokenKind_Push: {
