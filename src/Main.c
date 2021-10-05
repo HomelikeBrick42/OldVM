@@ -48,7 +48,6 @@ int main(int argc, char** argv) {
 
     free(vm);
     ByteArray_Destroy(&code);
-    Lexer_Destroy(&lexer);
 
     return EXIT_SUCCESS;
 

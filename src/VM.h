@@ -102,6 +102,14 @@ typedef enum Op {
     //      Stack: ptr
     Op_GetStackTop,
 
+    // Puts a pointer to the bottom of the stack on the stack
+    // Arguments:
+    //      Inst: op
+    //      Stack:
+    // Result:
+    //      Stack: ptr
+    Op_GetStackBottom,
+
     // Loads from a pointer
     // Arguments:
     //      Inst: op size

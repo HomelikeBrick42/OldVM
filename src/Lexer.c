@@ -42,8 +42,10 @@ String GetTokenKindName(TokenKind kind) {
             return String_FromLiteral("jump-zero");
         case TokenKind_JumpNonZero:
             return String_FromLiteral("jump-non-zero");
-        case TokenKind_GetTopStack:
-            return String_FromLiteral("get-top-stack");
+        case TokenKind_GetStackTop:
+            return String_FromLiteral("get-stack-top");
+        case TokenKind_GetStackBottom:
+            return String_FromLiteral("get-stack-bottom");
         case TokenKind_Load:
             return String_FromLiteral("load");
         case TokenKind_Store:
@@ -102,8 +104,12 @@ struct {
         .Kind = TokenKind_JumpNonZero,
     },
     {
-        .Name = String_FromLiteral("get-top-stack"),
-        .Kind = TokenKind_GetTopStack,
+        .Name = String_FromLiteral("get-stack-top"),
+        .Kind = TokenKind_GetStackTop,
+    },
+    {
+        .Name = String_FromLiteral("get-stack-bottom"),
+        .Kind = TokenKind_GetStackBottom,
     },
     {
         .Name = String_FromLiteral("load"),

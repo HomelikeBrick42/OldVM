@@ -198,9 +198,14 @@ void Emitter_Emit(Emitter* emitter) {
                 Emitter_Emit64(emitter, location);
             } break;
 
-            case TokenKind_GetTopStack: {
+            case TokenKind_GetStackTop: {
                 Emitter_NextToken(emitter);
                 Emitter_EmitOp(emitter, Op_GetStackTop);
+            } break;
+
+            case TokenKind_GetStackBottom: {
+                Emitter_NextToken(emitter);
+                Emitter_EmitOp(emitter, Op_GetStackBottom);
             } break;
 
             case TokenKind_Load: {
