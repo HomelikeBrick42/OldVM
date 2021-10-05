@@ -58,6 +58,14 @@ typedef enum Op {
     //      Stack: (a+b)
     Op_Add,
 
+    // Subtracts the 2 numbers on the top of the stack
+    // Arguments:
+    //      Inst: op size
+    //      Stack: a b
+    // Result:
+    //      Stack: (a-b)
+    Op_Sub,
+
     // Prints the data on the top of the stack
     // Arguments:
     //      Inst: op size
@@ -231,6 +239,41 @@ bool VM_Run(VM* vm) {
                 }
             } break;
 
+            case Op_Sub: {
+                uint64_t size = DECODE(vm->Ip, uint64_t);
+                switch (size) {
+                    case 1: {
+                        uint8_t b = POP_STACK(vm->Sp, uint8_t);
+                        uint8_t a = POP_STACK(vm->Sp, uint8_t);
+                        PUSH_STACK(vm->Sp, uint8_t, a - b);
+                    } break;
+
+                    case 2: {
+                        uint16_t b = POP_STACK(vm->Sp, uint16_t);
+                        uint16_t a = POP_STACK(vm->Sp, uint16_t);
+                        PUSH_STACK(vm->Sp, uint16_t, a - b);
+                    } break;
+
+                    case 4: {
+                        uint32_t b = POP_STACK(vm->Sp, uint32_t);
+                        uint32_t a = POP_STACK(vm->Sp, uint32_t);
+                        PUSH_STACK(vm->Sp, uint32_t, a - b);
+                    } break;
+
+                    case 8: {
+                        uint64_t b = POP_STACK(vm->Sp, uint64_t);
+                        uint64_t a = POP_STACK(vm->Sp, uint64_t);
+                        PUSH_STACK(vm->Sp, uint64_t, a - b);
+                    } break;
+
+                    default: {
+                        fflush(stdout);
+                        fprintf(stderr, "Unsupported subtract size %llu\n", size);
+                        return false;
+                    } break;
+                }
+            } break;
+
             case Op_Print: {
                 uint64_t size = DECODE(vm->Ip, uint64_t);
                 switch (size) {
@@ -317,7 +360,7 @@ bool VM_Run(VM* vm) {
                     return false;
                 }
 
-                uint8_t* ip            = (uint8_t*)func;
+                uint8_t* ip = (uint8_t*)func;
 
                 for (int64_t i = (int64_t)argCount - 1; i >= 0; i--) {
                     vm->Sp -= argSizes[i];
@@ -441,9 +484,11 @@ int main() {
 
         *ip++ = Op_CallCFunc;
         ENCODE(ip, uint64_t, 3);
+        // Argument sizes
         ENCODE(ip, uint64_t, sizeof(uint64_t));
         ENCODE(ip, uint64_t, sizeof(uint16_t));
         ENCODE(ip, uint64_t, sizeof(uint64_t*));
+        // Return size
         ENCODE(ip, uint64_t, sizeof(uint64_t));
 
         *ip++ = Op_Store;
