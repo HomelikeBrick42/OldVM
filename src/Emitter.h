@@ -12,7 +12,6 @@ typedef struct Label {
 typedef struct UnknownLabel {
     Token Token;
     uint64_t IndexForAddress;
-    bool Resolved;
 } UnknownLabel;
 
 ARRAY_DECL(Token, Token);

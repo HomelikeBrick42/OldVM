@@ -24,12 +24,15 @@ typedef enum TokenKind {
     TokenKind_Print,
     TokenKind_Dup,
     TokenKind_Jump,
+    TokenKind_JumpDyn,
     TokenKind_JumpZero,
     TokenKind_JumpNonZero,
     TokenKind_GetStackTop,
     TokenKind_GetStackBottom,
     TokenKind_Load,
     TokenKind_Store,
+    TokenKind_Call,
+    TokenKind_Ret,
     TokenKind_CallCFunc,
 } TokenKind;
 

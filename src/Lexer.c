@@ -46,6 +46,8 @@ String GetTokenKindName(TokenKind kind) {
             return String_FromLiteral("dup");
         case TokenKind_Jump:
             return String_FromLiteral("jump");
+        case TokenKind_JumpDyn:
+            return String_FromLiteral("jump-dyn");
         case TokenKind_JumpZero:
             return String_FromLiteral("jump-zero");
         case TokenKind_JumpNonZero:
@@ -58,6 +60,10 @@ String GetTokenKindName(TokenKind kind) {
             return String_FromLiteral("load");
         case TokenKind_Store:
             return String_FromLiteral("store");
+        case TokenKind_Call:
+            return String_FromLiteral("call");
+        case TokenKind_Ret:
+            return String_FromLiteral("ret");
         case TokenKind_CallCFunc:
             return String_FromLiteral("call-c-func");
     }
@@ -109,6 +115,10 @@ struct {
         .Kind = TokenKind_Jump,
     },
     {
+        .Name = String_FromLiteral("jump-dyn"),
+        .Kind = TokenKind_JumpDyn,
+    },
+    {
         .Name = String_FromLiteral("jump-zero"),
         .Kind = TokenKind_JumpZero,
     },
@@ -131,6 +141,14 @@ struct {
     {
         .Name = String_FromLiteral("store"),
         .Kind = TokenKind_Store,
+    },
+    {
+        .Name = String_FromLiteral("call"),
+        .Kind = TokenKind_Call,
+    },
+    {
+        .Name = String_FromLiteral("ret"),
+        .Kind = TokenKind_Ret,
     },
     {
         .Name = String_FromLiteral("call-c-func"),

@@ -78,6 +78,14 @@ typedef enum Op {
     //      Stack:
     Op_Jump,
 
+    // Moves the instruction pointer to the location specified on the stack
+    // Arguments:
+    //      Inst: op
+    //      Stack: loc
+    // Result:
+    //      Stack:
+    Op_JumpDyn,
+
     // Moves the instruction pointer to the location specified
     // Arguments:
     //      Inst: op size loc
@@ -125,6 +133,22 @@ typedef enum Op {
     // Result:
     //      Stack:
     Op_Store,
+
+    // Calls a function
+    // Arguments:
+    //      Inst: op arg-size
+    //      Stack: ptr arg-data
+    // Result:
+    //      Stack: ret-loc arg-data
+    Op_Call,
+
+    // Returns from a function
+    // Arguments:
+    //      Inst: op ret-size
+    //      Stack: ret-loc ret-data
+    // Result:
+    //      Stack: ret-data
+    Op_Ret,
 
     // Calls a C function
     // Arguments:

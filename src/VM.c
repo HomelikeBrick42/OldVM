@@ -190,6 +190,11 @@ bool VM_Run(VM* vm) {
                 vm->Ip            = &vm->Code[location];
             } break;
 
+            case Op_JumpDyn: {
+                uint64_t location = POP_STACK(vm->Sp, uint64_t);
+                vm->Ip            = &vm->Code[location];
+            } break;
+
             case Op_JumpZero: {
                 uint64_t size     = DECODE(vm->Ip, uint64_t);
                 uint64_t location = DECODE(vm->Ip, uint64_t);
@@ -247,6 +252,36 @@ bool VM_Run(VM* vm) {
                 for (uint64_t i = 0; i < size; i++) {
                     *ptr++ = data[i];
                 }
+            } break;
+
+            case Op_Call: {
+                uint64_t argSize = DECODE(vm->Ip, uint64_t);
+                uint8_t argData[argSize];
+                vm->Sp -= argSize;
+                for (uint64_t i = 0; i < argSize; i++) {
+                    argData[i] = vm->Sp[i];
+                }
+                uint64_t callLoc = POP_STACK(vm->Sp, uint64_t);
+                uint64_t location = vm->Ip - vm->Code;
+                PUSH_STACK(vm->Sp, uint64_t, location);
+                for (uint64_t i = 0; i < argSize; i++) {
+                    *vm->Sp++ = argData[i];
+                }
+                vm->Ip = &vm->Code[callLoc];
+            } break;
+
+            case Op_Ret: {
+                uint64_t retSize = DECODE(vm->Ip, uint64_t);
+                uint8_t retData[retSize];
+                vm->Sp -= retSize;
+                for (uint64_t i = 0; i < retSize; i++) {
+                    retData[i] = vm->Sp[i];
+                }
+                uint64_t location = POP_STACK(vm->Sp, uint64_t);
+                for (uint64_t i = 0; i < retSize; i++) {
+                    *vm->Sp++ = retData[i];
+                }
+                vm->Ip = &vm->Code[location];
             } break;
 
             case Op_CallCFunc: {

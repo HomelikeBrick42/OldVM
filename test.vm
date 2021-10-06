@@ -1,21 +1,10 @@
-macro load-counter (
-    get-stack-bottom
-    load 8
-)
-
-// Counter
-push 8 0
-:loop
-    // Increment counter
-    push 8 1
-    add 8
-
-    !load-counter
-    print 8
-
-    !load-counter
-    push 8 10
-    sub 8
-// Loop if not zero
-jump-non-zero 8 loop
+push add_func
+push 8 5
+push 8 6
+call 16
+print 8
 exit
+
+:add_func
+    add 8
+    ret 8
